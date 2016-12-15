@@ -60,8 +60,8 @@ def baseline_model(optimizer='adam', init_mode='uniform'):
     # model.add(Dense(1))
     model.add(Lambda(
       lambda x: x/127.5 - 1.,
-      input_shape=(2, 32, 32),
-      output_shape=(2, 32, 32))
+      input_shape=(2, 480, 640),
+      output_shape=(2, 480, 640))
     )
 
     # Several convolutional layers, each followed by ELU activation
@@ -140,7 +140,7 @@ class App:
         while (self.cap.isOpened()):
             ret, frame = self.cap.read()
             # Rexposes, blurs, and makes frame grayscale in order to smoothen it out.
-            if ret and self.frame_idx < 100:
+            if ret and self.frame_idx < 10:
                 gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
                 rescale_gray = skimage.exposure.rescale_intensity(gray,out_range=(0,255))
                 blur_gray = cv2.GaussianBlur(rescale_gray, (21, 21), 0)
