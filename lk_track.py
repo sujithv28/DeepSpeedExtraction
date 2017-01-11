@@ -58,8 +58,8 @@ class App:
             vis = frame.copy()
             self.frames.append(frame_gray)
 
-            Calculates the optical flow and sets the new velocity tracks along with
-            drawing them out starting from second frame onwards.
+            # Calculates the optical flow and sets the new velocity tracks along with
+            # drawing them out starting from second frame onwards.
             if len(self.tracks) > 0:
                 img0, img1 = self.prev_gray, frame_gray
                 speed = np.linalg.norm(img1-img0)
@@ -143,12 +143,12 @@ class App:
 
                 # Draw out all the information per frame.
                 cv2.polylines(vis, [np.int32(tr) for tr in self.tracks], False, (0,255,0))
-                draw_str(vis, (20, 20), 'track count: %d' % len(self.tracks))
-                draw_str(vis, (20, 40), 'frame: %d' % self.frame_idx)
-                draw_str(vis, (20, 60), 'speed (actual): %f' % dataset[1][self.frame_idx])
-                draw_str(vis, (20, 80), 'speed (guess): %f' % speed)
-                draw_str(vis, (20, 100), 'contours: %d' % len(cnts))
-                draw_str(vis, (20, 120), 'contour diff: %d' % diffy)
+                # draw_str(vis, (20, 20), 'track count: %d' % len(self.tracks))
+                # draw_str(vis, (20, 40), 'frame: %d' % self.frame_idx)
+                # draw_str(vis, (20, 60), 'speed (actual): %f' % dataset[1][self.frame_idx])
+                # draw_str(vis, (20, 80), 'speed (guess): %f' % speed)
+                # draw_str(vis, (20, 100), 'contours: %d' % len(cnts))
+                # draw_str(vis, (20, 120), 'contour diff: %d' % diffy)
 
             # Prints out the new frames and tracks.
             if self.frame_idx % self.detect_interval == 0:
@@ -166,7 +166,7 @@ class App:
             # and text information layered on.
             self.frame_idx += 1
             self.prev_gray = frame_gray
-            cv2.imshow('lk_track', frame_gray)
+            cv2.imshow('lk_track', vis)
 
             ch = 0xFF & cv2.waitKey(1)
             if ch == 27:

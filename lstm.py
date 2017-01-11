@@ -20,6 +20,7 @@ from keras.layers.advanced_activations import PReLU
 from keras.layers.normalization import BatchNormalization
 from sklearn.preprocessing import MinMaxScaler
 from keras.optimizers import SGD, RMSprop, Adadelta
+from keras.utils.visualize_util import plot
 from keras.utils import np_utils
 from keras import backend as K
 from skimage import transform, color, exposure
@@ -93,8 +94,6 @@ def baseline_model(optimizer='adam', init_mode='uniform'):
     model.add(MaxPooling2D(pool_size=(2, 2), strides=(2,2)))
     model.add(Convolution2D(128, 3, 3, border_mode='same', activation='relu'))
     model.add(BatchNormalization(mode=0, axis=1))
-    model.add(Convolution2D(128, 3, 3, border_mode='same', activation='relu'))
-    model.add(BatchNormalization(mode=0, axis=1))
     model.add(MaxPooling2D(pool_size=(2, 2), strides=(2,2)))
     model.add(Flatten())
     model.add(Dense(512, activation='relu'))
@@ -105,7 +104,7 @@ def baseline_model(optimizer='adam', init_mode='uniform'):
     model.add(TimeDistributed(Dense(128, activation='relu')))
     model.add(Dense(1))
     model.compile(optimizer="adam", loss="mse")
-
+    plot(model, to_file='model_lstm_cnn.png')
     print("[INFO] compiling uniform batch normalization model...")
     return model
 

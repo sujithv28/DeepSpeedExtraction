@@ -12,6 +12,7 @@ from keras.callbacks import LearningRateScheduler
 from keras.layers.advanced_activations import PReLU
 from keras.layers.normalization import BatchNormalization
 from keras.optimizers import SGD
+from keras.utils.visualize_util import plot
 from keras.utils import np_utils
 from skimage import transform, color, exposure
 from skimage.transform import rotate
@@ -119,7 +120,7 @@ class App:
         callbacks_list = [lrate]
         self.model = baseline_model()
         #self.model = KerasRegressor(build_fn=baseline_model, nb_epoch=150, batch_size=60, verbose=1)
-        self.model.fit(self.X_train, self.Y_train, nb_epoch=150, batch_size=64, validation_split=0.15, shuffle=True, callbacks=callbacks_list, verbose=1)
+        self.model.fit(self.X_train, self.Y_train, nb_epoch=50, batch_size=64, validation_split=0.15, shuffle=True, callbacks=callbacks_list, verbose=1)
         self.model.save('all_model.h5')
 
     def evaluate_model(self):
