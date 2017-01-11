@@ -51,7 +51,11 @@ class App:
         while (self.cap.isOpened()):
             ret, frame = self.cap.read()
             # Rexposes, blurs, and makes frame grayscale in order to smoothen it out.
+<<<<<<< HEAD
             if ret and self.frame_idx<100:
+=======
+            if ret:
+>>>>>>> a5278f4e23bf4df075e3285734e782202abb0db6
                 gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
                 rescale_gray = skimage.exposure.rescale_intensity(gray,out_range=(0,255))
                 blur_gray = cv2.GaussianBlur(rescale_gray, (21, 21), 0)
@@ -85,7 +89,11 @@ class App:
         for i in range(0, len(output)):
             print("[INFO] actual: %f, estimate: %f" % (self.speeds[i], output[i]))
         row = np.array(output)
+<<<<<<< HEAD
         with open("guess2.json", 'wb') as outfile:
+=======
+        with open("guess.json", 'wb') as outfile:
+>>>>>>> a5278f4e23bf4df075e3285734e782202abb0db6
             json.dump(row.tolist(), outfile)
 
 def main():

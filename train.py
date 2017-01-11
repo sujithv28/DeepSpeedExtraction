@@ -111,8 +111,7 @@ class App:
         self.speeds = np.array(self.speeds)
         (self.X_train, self.X_test, self.Y_train, self.Y_test) = train_test_split(self.data, self.speeds, test_size=0.15, random_state=42)
         scale = StandardScaler()
-        self.X_train = scale.fit_transform(self.data)
-        self.Y_train = self.speeds
+        self.X_train = scale.fit_transform(self.X_train)
         self.X_test = scale.transform(self.X_test)
 
     def train_model(self):
@@ -120,8 +119,8 @@ class App:
         callbacks_list = [lrate]
         self.model = baseline_model()
         #self.model = KerasRegressor(build_fn=baseline_model, nb_epoch=150, batch_size=60, verbose=1)
-        self.model.fit(self.X_train, self.Y_train, nb_epoch=50, batch_size=64, validation_split=0.15, shuffle=True, callbacks=callbacks_list, verbose=1)
-        self.model.save('all_model.h5')
+        self.model.fit(self.X_train, self.Y_train, nb_epoch=150, batch_size=64, validation_split=0.15, shuffle=True, callbacks=callbacks_list, verbose=1)
+        self.model.save('model.h5')
 
     def evaluate_model(self):
         print("[INFO] evaluating on testing set...")

@@ -15,6 +15,9 @@ from keras.constraints import maxnorm
 from keras.layers.core import RepeatVector, Activation, Dropout, Dense, Lambda, Flatten, TimeDistributedDense
 from keras.layers.convolutional import Convolution2D, MaxPooling2D
 from keras.layers.recurrent import LSTM, GRU, SimpleRNN
+from keras.wrappers.scikit_learn import KerasRegressor
+from keras.constraints import maxnorm
+from keras.layers.core import Activation, Dropout, Dense, LSTM
 from keras.callbacks import LearningRateScheduler
 from keras.layers.advanced_activations import PReLU
 from keras.layers.normalization import BatchNormalization
@@ -42,6 +45,7 @@ seed = 7
 np.random.seed(seed)  # for reproducibility
 
 def step_decay(epoch):
+<<<<<<< HEAD
     initial_lrate = 0.1
     drop = 0.5
     epochs_drop = 10.0
@@ -106,6 +110,25 @@ def baseline_model(optimizer='adam', init_mode='uniform'):
     model.compile(optimizer="adam", loss="mse")
     plot(model, to_file='model_lstm_cnn.png')
     print("[INFO] compiling uniform batch normalization model...")
+	initial_lrate = 0.1
+	drop = 0.5
+	epochs_drop = 10.0
+	lrate = initial_lrate * math.pow(drop, math.floor((1+epoch)/epochs_drop))
+	return float(lrate)
+
+def baseline_model(optimizer='adam', init_mode='uniform'):
+    model = Sequential()
+    model.add(Dense(1536, input_dim=6144, init=init_mode, activation="relu"))
+    model.add(BatchNormalization())
+    #model.add(Dropout(0.20))
+    model.add(Dense(768, init=init_mode, activation="relu"))
+    model.add(BatchNormalization())
+    #model.add(Dropout(0.20))
+    model.add(Dense(1))
+    print("[INFO] compiling uniform batch normalization model...")
+    model.compile(loss='mean_squared_error', optimizer=optimizer, metrics=['accuracy'])
+    #sgd = SGD(lr=0.0, momentum=0.9, decay=0.0, nesterov=False)
+    #model.compile(loss='mean_squared_logarithmic_error', optimizer=sgd, metrics=['accuracy'])
     return model
 
 class App:
@@ -139,7 +162,7 @@ class App:
         while (self.cap.isOpened()):
             ret, frame = self.cap.read()
             # Rexposes, blurs, and makes frame grayscale in order to smoothen it out.
-            if ret and self.frame_idx < 10:
+            if ret:
                 gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
                 rescale_gray = skimage.exposure.rescale_intensity(gray,out_range=(0,255))
                 blur_gray = cv2.GaussianBlur(rescale_gray, (21, 21), 0)
@@ -148,6 +171,8 @@ class App:
                     prev_frame, curr_frame = self.frames[self.frame_idx-1], self.frames[self.frame_idx]
                     flow_matrix = cv2.calcOpticalFlowFarneback(prev_frame, curr_frame, 0.5, 3, 15, 2, 5, 1.2, 0)
                     self.data.append(flow_matrix)
+                    # features = cv2.resize(flow_matrix, (64, 48)).flatten()
+                    # self.data.append(features)
                     speed = self.dataset[1][self.frame_idx]
                     self.speeds.append(speed)
                     cv2.imshow('flow', self.draw_flow(gray, flow_matrix))
@@ -172,6 +197,10 @@ class App:
         # # self.X_test = scale.transform(self.X_test)
         self.X_train = self.X_train.reshape(self.X_train.shape[0], 2, 480, 640).astype('float32')
         self.X_test = self.X_test.reshape(self.X_test.shape[0], 2, 480, 640).astype('float32')
+        # dataset = scaler.fit_transform(self.data)
+        # (self.X_train, self.X_test, self.Y_train, self.Y_test) = train_test_split(self.data, self.speeds, test_size=0.15, random_state=42)
+        # self.X_train = scale.fit_transform(self.X_train)
+        # self.X_test = scale.transform(self.X_test)
 
     def train_model(self):
         lrate = LearningRateScheduler(step_decay)
@@ -182,6 +211,10 @@ class App:
         #self.model = KerasRegressor(build_fn=baseline_model, nb_epoch=150, batch_size=60, verbose=1)
         self.model.fit(self.X_train, self.Y_train, nb_epoch=50, batch_size=64, validation_split=0.15, shuffle=True, callbacks=callbacks_list, verbose=1)
         # self.model.save('lstm_model.h5')
+        self.model = baseline_model()
+        #self.model = KerasRegressor(build_fn=baseline_model, nb_epoch=150, batch_size=60, verbose=1)
+        self.model.fit(self.X_train, self.Y_train, nb_epoch=150, batch_size=64, validation_split=0.15, shuffle=True, callbacks=callbacks_list, verbose=1)
+        self.model.save('model.h5')
 
     def evaluate_model(self):
         print("[INFO] evaluating on testing set...")
