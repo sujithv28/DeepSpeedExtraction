@@ -12,9 +12,11 @@ from keras.layers.convolutional import Convolution2D, MaxPooling2D
 from keras.layers.recurrent import LSTM
 from keras.layers.normalization import BatchNormalization
 from keras import backend as K
+from skimage import transform, color, exposure
 import skimage as skimage
 import numpy as np
 import pandas
+import math
 import cv2
 
         
@@ -56,7 +58,7 @@ print('[INFO] Constructing flow matrices and speed truth...')
 while (cap.isOpened()):
     ret, frame = cap.read()
     # Rexposes, blurs, and makes frame grayscale in order to smoothen it out.
-    if ret and frame_idx < 20:
+    if ret and frame_idx < 100:
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         rescale_gray = skimage.exposure.rescale_intensity(gray,out_range=(0,255))
         blur_gray = cv2.GaussianBlur(rescale_gray, (21, 21), 0)
@@ -102,22 +104,17 @@ X_test = X_test.reshape(X_test.shape).astype('float32')
 
 # Create prediction model
 model = Sequential()
-model.add(Convolution2D(64, 3, 3, border_mode='valid', input_shape=(480, 640, 2), activation='relu'))
+model.add(Convolution2D(30, 5, 5, border_mode='valid', input_shape=(480, 640, 2), activation='relu'))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 model.add(Dropout(0.2))
-model.add(Convolution2D(64, 5, 5, border_mode='same', activation='relu'))
-model.add(BatchNormalization(mode=0, axis=1))
+model.add(Convolution2D(60, 5, 5, border_mode='same', activation='relu'))
 model.add(MaxPooling2D(pool_size=(2, 2), strides=(2,2)))
-model.add(Convolution2D(128, 7, 7, border_mode='same', activation='relu'))
-model.add(BatchNormalization(mode=0, axis=1))
-model.add(MaxPooling2D(pool_size=(2, 2), strides=(2,2)))
+model.add(Dropout(0.2))
 model.add(Flatten())
-model.add(Dense(512, activation='relu'))
+model.add(Dense(512, init='uniform', activation="relu"))
 model.add(BatchNormalization())
-model.add(Dropout(0.3))
-model.add(LSTM(512, return_sequences=True))
-model.add(TimeDistributed(Dropout(0.2)))
-model.add(TimeDistributed(Dense(128, activation='relu')))
+model.add(Dense(128, init='uniform', activation="relu"))
+model.add(BatchNormalization())
 model.add(Dense(1))
 model.compile(optimizer="adam", loss="mse")
 
