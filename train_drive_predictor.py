@@ -58,7 +58,7 @@ print('[INFO] Constructing flow matrices and speed truth...')
 while (cap.isOpened()):
     ret, frame = cap.read()
     # Rexposes, blurs, and makes frame grayscale in order to smoothen it out.
-    if ret and frame_idx < 100:
+    if ret:
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         rescale_gray = skimage.exposure.rescale_intensity(gray,out_range=(0,255))
         blur_gray = cv2.GaussianBlur(rescale_gray, (21, 21), 0)
